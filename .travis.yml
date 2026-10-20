@@ -1,0 +1,38 @@
+# disable in ALA org, as GH Actions now used
+if: repo != AtlasOfLivingAustralia/collectory
+language: groovy
+dist: focal
+jdk:
+  - openjdk17
+
+before_install:
+  - java -version
+  - javac -version
+branches:
+  only:
+    - master
+    - develop
+    - /^\d+-/ # GH generated issue branches
+before_cache:
+  - rm -f  $HOME/.gradle/caches/modules-2/modules-2.lock
+  - rm -fr $HOME/.gradle/caches/*/plugin-resolution/
+
+cache:
+  directories:
+    - $HOME/.m2
+    - $HOME/.gradle/caches/
+    - $HOME/.gradle/wrapper/
+
+install:
+  - 'travis_wait 30 ./gradlew clean'
+  - './gradlew assemble'
+
+after_success:
+  - './gradlew bootJar'
+  - '[ "${TRAVIS_PULL_REQUEST}" = "false" ] && travis_retry ./gradlew publish'
+
+env:
+  global:
+    - JAVA_TOOL_OPTIONS=-Dhttps.protocols=TLSv1.2
+    - secure: G31IscTcNtjjFA0R2pDRaZ2Std1d5F3pIfr3NUe0PsKcj8F2ubFd6xZ3LCccKu/HdDdlJ/6K6Khn1EfwHie5NRP+Uu7oAUOVkTXSeI4KfQFywpf3TvKLILh8/2NUe0451ESivKQ28UW4jPOehmLtCyd7MbxnO9GIrYyaWjNEJJw=
+    - secure: g7txXzs6g/DzF9bwI5UZ4wG2QxB4aqQeAK1TxL3P0DfMHB8hXs/BydKrFaA9TnJiB/g0fwabNCuJWr+IgOL3EPA1txwVu9VVttHqKiJXthoen1eN0QJtsCWhlE2/ldC1mENaJVXBQs7++sNutytUIOr9m2Yk78mXnu2RIfk7U/k=

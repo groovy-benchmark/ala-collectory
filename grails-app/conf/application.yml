@@ -1,0 +1,487 @@
+---
+grails:
+    appName: collectory
+    serverURL: http://dev.ala.org.au:8080
+    profile: web
+    codegen:
+        defaultPackage: au.org.ala.collectory
+    config:
+        locations:
+            - file:/data/collectory/config/collectory-config.yml
+            - file:/data/collectory/config/collectory-config.properties
+            - file:/data/collectory/config/collectory-config.groovy
+    cors:
+        enabled: true
+    gorm:
+        reactor:
+            # Whether to translate GORM events into Reactor events
+            # Disabled by default for performance reasons
+            events: false
+info:
+    app:
+        name: '@info.app.name@'
+        version: '@info.app.version@'
+        grailsVersion: '@info.app.grailsVersion@'
+spring:
+    jmx:
+        unique-names: true
+    main:
+        banner-mode: "off"
+    groovy:
+        template:
+            check-template-location: false
+    devtools:
+        restart:
+            additional-exclude:
+                - '*.gsp'
+                - '**/*.gsp'
+                - '*.gson'
+                - '**/*.gson'
+                - 'logback.groovy'
+                - '*.properties'
+management:
+    endpoints:
+        enabled-by-default: false
+
+---
+grails:
+    mime:
+        disable:
+            accept:
+                header:
+                    userAgents:
+                        - Gecko
+                        - WebKit
+                        - Presto
+                        - Trident
+        types:
+            all: '*/*'
+            atom: application/atom+xml
+            css: text/css
+            csv: text/csv
+            form: application/x-www-form-urlencoded
+            html:
+              - text/html
+              - application/xhtml+xml
+            js: text/javascript
+            json:
+              - application/json
+              - text/json
+            multipartForm: multipart/form-data
+            pdf: application/pdf
+            rss: application/rss+xml
+            text: text/plain
+            hal:
+              - application/hal+json
+              - application/hal+xml
+            xml:
+              - text/xml
+              - application/xml
+    urlmapping:
+        cache:
+            maxsize: 1000
+    controllers:
+        defaultScope: singleton
+        upload:
+            maxFileSize: 26214400
+            maxRequestSize: 26214400
+    converters:
+        encoding: UTF-8
+    views:
+        default:
+            codec: html
+        gsp:
+            encoding: UTF-8
+            htmlcodec: xml
+            codecs:
+                expression: html
+                scriptlet: html
+                taglib: none
+                staticparts: none
+---
+hibernate:
+    cache:
+        queries: false
+        use_second_level_cache: false
+        use_query_cache: false
+
+projectName: Atlas of Living Australia
+regionName: Australia
+uploadFilePath: /data/collectory/upload/
+uploadExternalUrlPath: http://localhost/upload
+gbifApiUrl: 'https://api.gbif.org/v1/'
+gbifUniqueKeyTerm: "http://rs.gbif.org/terms/1.0/gbifID"
+gbifWebsite: "https://www.gbif-test.org/"
+
+# country 3 digit ISO code. Non-empty value required at startup
+gbifDefaultEntityCountry:
+
+gbif:
+    citations:
+        lookup: "${gbifApiUrl}literature/search?contentType=literature&gbifDatasetKey="
+        search: "${gbifWebsite}resource/search?contentType=literature&gbifDatasetKey="
+        enabled: true
+
+# GBIF Registration enables the Collectory to create and update organisations and datasets
+# This mode of operation is only expected to be used by National Nodes running the ALA as a publishing gateway to GBIF.
+# (i.e. where the ALA installation is not sourcing information from GBIF.org itself)
+gbifRegistrationEnabled: false
+gbifEndorsingNodeKey: XXXXXXXXXXXXXXXX
+gbifInstallationKey: XXXXXXXXXXXXXXXX
+gbifApiUser: XXXXXXXXXXXXXXXX
+gbifApiPassword: XXXXXXXXXXXXXXXX
+gbifExportUrlBase:
+gbifRegistrationDryRun: true
+gbifLicenceMappingUrl: file:///data/collectory/config/default-gbif-licence-mapping.json
+gbifOrphansPublisherID: XXXXXXXXXXXXXXXX
+useGbifDoi: true
+gbifRegistrationRole: ROLE_ADMIN
+
+skin:
+    layout: ala-main
+    fluidLayout: true
+    homeUrl: http://www.ala.org.au
+    orgNameLong: Atlas of Living Australia
+    orgNameShort: Atlas
+    orgSupportEmail: support@ala.org.au
+    favicon: https://www.ala.org.au/app/uploads/2019/01/cropped-favicon-32x32.png
+
+headerAndFooter:
+    baseURL: https://www.test.ala.org.au/commonui-bs5-2019
+    version: 2
+
+security:
+    #deprecated after 6.1.0
+    apikey:
+        checkEnabled: true
+        enabled: true
+        auth:
+            serviceUrl: https://auth-test.ala.org.au/apikey/
+        check:
+            serviceUrl: https://auth-test.ala.org.au/apikey/ws/check?apikey=
+        userdetails:
+            serviceUrl: https://auth-test.ala.org.au/userdetails/userDetails/
+    cas:
+        casServerName: https://auth-test.ala.org.au
+        uriFilterPattern:
+            - /admin/*
+            - /collection/*
+            - /institution/*
+            - /contact/*
+            - /reports/*
+            - /providerCode/*
+            - /providerMap/*
+            - /dataProvider/*
+            - /dataResource/*
+            - /dataHub/*
+            - /manage/*
+            - /alaAdmin/*
+        authenticateOnlyIfLoggedInFilterPattern:
+            - /public/show/*
+        uriExclusionFilterPattern:
+            - /images.*
+            - /css.*
+            - /js.*
+            - /static.*
+        appServerName: http://localhost:8080
+        casServerUrlPrefix: https://auth-test.ala.org.au/cas
+        loginUrl: https://auth-test.ala.org.au/cas/login
+        logoutUrl: https://auth-test.ala.org.au/cas/logout
+        bypass: false
+        disableCAS: true
+        ignoreCase: true
+        authCookieName: ALA-Auth
+        enabled: false
+    oidc:
+        enabled: true
+        discoveryUri: 'change me'
+        clientId: 'change me'
+        secret: 'change me'
+        allowUnsignedIdTokens: true
+        scope: 'openid profile email ala roles'
+    jwt:
+        enabled: true
+        discoveryUri: https://auth-test.ala.org.au/cas/oidc/.well-known
+        fallbackToLegacyBehaviour: true
+        rolesFromAccessToken: true
+        userIdClaim: username
+        roleClaims: cognito:groups
+    upload:
+        ipWhitelist:
+            - "127.0.0.1"
+            - "::1"
+            - "0:0:0:0:0:0:0:1"
+        apiKey: ""
+        trustedProxies:
+            - "127.0.0.1"
+            - "::1"
+            - "0:0:0:0:0:0:0:1"
+
+repository:
+    location:
+        images: /data/collectory/data
+
+loggerURL: https://logger.test.ala.org.au/service
+alertsUrl: https://alerts-test.ala.org.au
+alertResourceName: 'Alerts'
+speciesListToolUrl: https://lists-test.ala.org.au/speciesListItem/list/
+disableAlertLinks: false
+disableLoggerLinks: false
+biocacheServicesUrl: https://biocache.test.ala.org.au/ws
+biocacheUiURL: https://biocache.ala.org.au
+#eventsUiURL: https://events.ala.org.au/?datasetKey=
+#eventsURL: https://api.ala.org.au/event/graphql
+isPipelinesCompatible: true
+showExtraInfoInDataSetsView.enabled: false
+showExtraInfoInDataSetsView.relativeTime: false
+
+ROLE_ADMIN: 'ROLE_ADMIN'
+ROLE_EDITOR: 'ROLE_EDITOR'
+REQUIRED_SCOPES: 'ala/internal'
+
+rifcs:
+    excludeBounds: true
+
+# URL paths for archives
+resource.publicArchive.url.template: "https://biocache.ala.org.au/archives/gbif/@UID@/@UID@.zip"
+resource.gbifExport.url.template: "https://biocache.ala.org.au/archives/gbif/@UID@/@UID@.zip"
+citation.template: "Records provided by @entityName@, accessed through ALA website."
+citation.link.template: "For more information: @link@"
+citation.rights.template: ""
+
+siteDefaultLanguage: "en"
+showDataResourceWebsiteBelowH3: false
+
+networkTypes:
+    - BCI
+    - CHAH
+    - CHAEC
+    - CHAFC
+    - CHACM
+
+dataResource:
+    statusList:
+        - "identified"
+        - "inProgress"
+        - "dataAvailable"
+        - "linksAvailable"
+        - "declined"
+    resourceTypeList:
+        - "records"
+        - "website"
+        - "document"
+        - "uploads"
+        - "species-list"
+        - "publications"
+        - "events"
+    permissionsDocumentTypes:
+        - ""
+        - "Email"
+        - "Data Provider Agreement"
+        - "Web Page"
+        - "Other"
+    contentTypesList:
+        - "acoustic recording"
+        - "authoritative"
+        - "behaviour"
+        - "biologging"
+        - "citizen science"
+        - "camera trapping"
+        - "commercial uses"
+        - "common names"
+        - "conservation management"
+        - "conservation status"
+        - "description"
+        - "distribution maps"
+        - "distribution text"
+        - "feeding and diet"
+        - "habitat"
+        - "human interaction"
+        - "identification keys"
+        - "images"
+        - "lifecycle"
+        - "molecular"
+        - "movies"
+        - "pest management"
+        - "pest status"
+        - "point occurrence data"
+        - "population"
+        - "references"
+        - "reproduction"
+        - "scientific names"
+        - "sensitive species lists"
+        - "similar species"
+        - "sound"
+        - "species interactions"
+        - "species list"
+        - "taxonomy"
+        - "threats"
+    provenanceTypesList:
+        - "Individual sightings"
+        - "Published dataset"
+        - "Draft"
+collection:
+    collectionTypes:
+        - "archival"
+        - "art"
+        - "audio"
+        - "cellcultures"
+        - "electronic"
+        - "facsimiles"
+        - "fossils"
+        - "genetic"
+        - "living"
+        - "observations"
+        - "preserved"
+        - "products"
+        - "seedbank"
+        - "taxonomic"
+        - "texts"
+        - "tissue"
+        - "visual"
+    kingdoms:
+        - "Animalia"
+        - "Archaebacteria"
+        - "Eubacteria"
+        - "Fungi"
+        - "Plantae"
+        - "Protista"
+    developmentStatuses:
+        - "Active growth"
+        - "Closed"
+        - "Consumable"
+        - "Decreasing"
+        - "Lost"
+        - "Missing"
+        - "Passive growth"
+        - "Static"
+institution:
+    institutionTypes:
+        - "aquarium"
+        - "archive"
+        - "botanicGarden"
+        - "conservation"
+        - "fieldStation"
+        - "government"
+        - "governmentDepartment"
+        - "herbarium"
+        - "historicalSociety"
+        - "horticulturalInstitution"
+        - "independentExpert"
+        - "industry"
+        - "laboratory"
+        - "library"
+        - "management"
+        - "museum"
+        - "natureEducationCenter"
+        - "nonUniversityCollege"
+        - "park"
+        - "repository"
+        - "researchInstitute"
+        - "school"
+        - "scienceCenter"
+        - "society"
+        - "university"
+        - "voluntaryObserver"
+        - "zoo"
+contacts:
+    titles:
+        - "Dr"
+        - "Prof"
+        - "Mr"
+        - "Ms"
+        - "Mrs"
+        - "Assoc Prof"
+        - "Assist Prof"
+
+
+cartodb:
+    pattern: "https://cartodb-basemaps-${s}.global.ssl.fastly.net/light_nolabels/${z}/${x}/${y}.png"
+
+eml:
+    organizationName: Atlas of Living Australia
+    deliveryPoint: CSIRO Ecosystems Services
+    city: Canberra
+    administrativeArea: ACT
+    postalCode: 2601
+    country: Australia
+
+
+google:
+    apikey: "TO-BE-ADDED"
+
+dataSource:
+    pooled: true
+    jmxExport: true
+    driverClassName: com.mysql.cj.jdbc.Driver
+    username: root
+    password: 'password'
+
+environments:
+    development:
+        grails:
+            assets:
+                storagePath: "/data/collectory"
+            plugin:
+                sentry:
+                    active: false
+        dataSource:
+            dbCreate: update
+            url: jdbc:mysql://localhost:3306/collectory?autoReconnect=true&connectTimeout=0&useUnicode=true&characterEncoding=UTF-8&serverTimezone=Australia/Sydney
+            username: collectory_user
+            password: "password"
+            logSql: false
+        gbifDefaultEntityCountry: AUS
+    test:
+        grails:
+            assets:
+                storagePath: "/data/collectory"
+            plugin:
+                sentry:
+                    active: false
+        dataSource:
+            dbCreate: update
+            url: jdbc:h2:mem:testDb;MVCC=TRUE;LOCK_TIMEOUT=10000;DB_CLOSE_ON_EXIT=FALSE
+        gbifDefaultEntityCountry: AUS
+    production:
+        grails:
+            assets:
+                storagePath: "/data/collectory"
+        dataSource:
+            dbCreate: none
+            url: jdbc:mysql://localhost:3306/collectory?autoReconnect=true&connectTimeout=0&useUnicode=true&characterEncoding=UTF-8
+            properties:
+                jmxEnabled: true
+                initialSize: 5
+                maxActive: 50
+                minIdle: 5
+                maxIdle: 25
+                maxWait: 10000
+                maxAge: 600000
+                timeBetweenEvictionRunsMillis: 5000
+                minEvictableIdleTimeMillis: 60000
+                validationQuery: SELECT 1
+                validationQueryTimeout: 3
+                validationInterval: 15000
+                testOnBorrow: true
+                testWhileIdle: true
+                testOnReturn: false
+                jdbcInterceptors: ConnectionState
+                defaultTransactionIsolation: 2 # TRANSACTION_READ_COMMITTED
+
+openapi:
+    title: Collectory REST services
+    description: REST services for interacting with the collectory webapp
+    terms: https://www.ala.org.au/terms-of-use
+    contact:
+        name: Support
+        email: support@ala.org.au
+    license:
+        name: Mozilla Public License 1.1
+        url: https://www.mozilla.org/en-US/MPL/1.1/
+    version: '@info.app.version@'
+    cachetimeoutms: 0
+
+sitemap:
+    dir: /data/collectory
+    enabled: true
